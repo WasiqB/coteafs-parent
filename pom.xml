@@ -74,6 +74,7 @@
 		<commons.version>3.5</commons.version>
 		<nexus.version>1.6.8</nexus.version>
 		<jacoco.version>0.7.9</jacoco.version>
+		<sonar.version>4.10.0.10260</sonar.version>
 		<suite-xml>testng.xml</suite-xml>
 		<jackson.version>2.9.0.pr3</jackson.version>
 		<guava.version>21.0</guava.version>
