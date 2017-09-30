@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
@@ -70,7 +70,7 @@
 		<truth.version>0.36</truth.version>
 		<yaml-version>1.18</yaml-version>
 		<selenium-version>3.5.3</selenium-version>
-		<appium-version>5.0.3</appium-version>
+		<appium-version>4.1.2</appium-version>
 		<commons.version>3.6</commons.version>
 		<nexus.version>1.6.8</nexus.version>
 		<jacoco.version>0.7.9</jacoco.version>
