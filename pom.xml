@@ -4,16 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>2.0.0</version>
+	<version>2.0.1</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
 	<inceptionYear>2017</inceptionYear>
-	<url>https://gitlab.com/coteafs/parent</url>
+	<url>https://github.com/WasiqB/coteafs-parent</url>
 
 	<organization>
 		<name>Wasiq Bhamla</name>
-		<url>https://gitlab.com/WasiqB</url>
+		<url>https://github.com/WasiqB</url>
 	</organization>
 
 	<licenses>
@@ -23,7 +23,7 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
+
 	<developers>
 		<developer>
 			<name>Wasiq Bhamla</name>
@@ -33,28 +33,29 @@
 				<role>Maintainer</role>
 			</roles>
 			<organization>Wasiq Bhamla</organization>
-			<organizationUrl>https://gitlab.com/WasiqB</organizationUrl>
+			<organizationUrl>https://github.com/WasiqB</organizationUrl>
 			<timezone>+5</timezone>
 		</developer>
 	</developers>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://gitlab.com/coteafs/parent/issues</url>
+		<url>https://github.com/WasiqB/coteafs-parent/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:git@gitlab.com:coteafs/parent.git</connection>
-		<developerConnection>scm:git:git@gitlab.com:coteafs/parent.git</developerConnection>
-		<url>https://gitlab.com/coteafs/parent</url>
+		<connection>scm:git:git@github.com:WasiqB/coteafs-parent.git</connection>
+		<developerConnection>scm:git:git@github.com:WasiqB/coteafs-parent.git</developerConnection>
+		<url>https://github.com/WasiqB/coteafs-parent</url>
 	</scm>
 
 	<ciManagement>
 		<system>GitLab</system>
-		<url>https://gitlab.com/coteafs/parent/pipelines</url>
+		<url>https://github.com/WasiqB/coteafs-parent/pipelines</url>
 	</ciManagement>
 
 	<properties>
+		<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
 		<sonar.jacoco.reportPaths>${project.basedir}/reports/jacoco.exec</sonar.jacoco.reportPaths>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -236,8 +237,7 @@
 							<suiteXmlFiles>
 								<suiteXmlFile>${suite-xml}</suiteXmlFile>
 							</suiteXmlFiles>
-							<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent
-								${surefireArgLine}</argLine>
+							<argLine>${argLine} ${surefireArgLine}</argLine>
 						</configuration>
 					</plugin>
 				</plugins>
