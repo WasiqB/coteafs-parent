@@ -2,3 +2,6 @@
 /*.gpg
 /*.gpg.lock
 /target/
+/.settings/
+/.classpath
+/.project
