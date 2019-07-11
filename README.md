@@ -74,6 +74,11 @@ You can use the following dependency into your `pom.xml` to use this library.
         <img alt="Wasiq Bhamla: Framework developer and maintainer." src="https://github.com/WasiqB.png" width=100 height=100 />
       </a>
     </li>
+    <li>
+      <a href="https://github.com/mfaisalkhatri">
+        <img alt="Mohammad Faisal Khatri: Framework Tester." src="https://github.com/mfaisalkhatri.png" width=100 height=100 />
+      </a>
+    </li>
   </ul>
 </div>
 
