@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>2.2.0</version>
+	<version>3.0.0</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
@@ -52,13 +52,16 @@
 	<properties>
 		<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
 		<sonar.jacoco.reportPaths>${project.basedir}/reports/jacoco.exec</sonar.jacoco.reportPaths>
+		<checkstyle.config>checkstyle.xml</checkstyle.config>
+		<checkstyle.suppress>checkstyle-suppressions.xml</checkstyle.suppress>
+		<checkstyle.version>3.1.0</checkstyle.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.source.encoding>UTF-8</maven.source.encoding>
 		<maven.source.version>3.1.0</maven.source.version>
-		<maven.javadoc.version>3.1.0</maven.javadoc.version>
+		<maven.javadoc.version>3.1.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<surefire-version>3.0.0-M3</surefire-version>
 		<maven.clean.version>3.1.0</maven.clean.version>
@@ -66,13 +69,12 @@
 		<version.version>2.7</version.version>
 		<nexus.version>1.6.8</nexus.version>
 		<jacoco.version>0.8.4</jacoco.version>
-		<sonar.version>5.13.0.18197</sonar.version>
+		<sonar.version>5.14.0.18788</sonar.version>
 		<suite-xml>testng.xml</suite-xml>
-		<guava.version>28.0-jre</guava.version>
-		<testng.version>6.14.3</testng.version>
-		<truth.version>0.46</truth.version>
+		<guava.version>28.1-jre</guava.version>
+		<testng.version>7.0.0</testng.version>
+		<truth.version>1.0</truth.version>
 		<commons.version>3.9</commons.version>
-		<yaml-version>1.24</yaml-version>
 	</properties>
 
 	<distributionManagement>
@@ -90,6 +92,7 @@
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>${maven.clean.version}</version>
 				<executions>
@@ -209,6 +212,41 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<executions>
+					<execution>
+						<id>verify-style</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<configLocation>${checkstyle.config}</configLocation>
+					<suppressionsLocation>${checkstyle.suppress}</suppressionsLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<logViolationsToConsole>true</logViolationsToConsole>
+					<failOnViolation>true</failOnViolation>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.duraspace</groupId>
+						<artifactId>codestyle</artifactId>
+						<version>1.0.0</version>
+					</dependency>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>8.24</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

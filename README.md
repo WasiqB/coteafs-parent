@@ -28,6 +28,8 @@ It is not advisable to copy paste same block of common code in every project's `
 
 :point_right: `maven-surefire-plugin`
 
+:point_right: `maven-checkstyle-plugin`
+
 ### Profiles declared
 
 :point_right: `coverage-per-test`: Used for analyzing code coverage for Sonarcloud.
@@ -43,7 +45,7 @@ In your `pom.xml`, add following block to use this POM,
   <parent>
     <groupId>com.github.wasiqb.coteafs</groupId>
     <artifactId>parent</artifactId>
-    <version>2.2.0</version>
+    <version>3.0.0</version>
   </parent>
   . . .
 ```
