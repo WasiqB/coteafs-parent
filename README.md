@@ -50,7 +50,7 @@ You can use the following dependency into your `pom.xml` to use this library.
   <parent>
     <groupId>com.github.wasiqb.coteafs</groupId>
     <artifactId>parent</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
   </parent>
   . . .
 ```

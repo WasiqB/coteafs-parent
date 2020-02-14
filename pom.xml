@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>3.0.0</version>
+	<version>3.1.0</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
 	<inceptionYear>2017</inceptionYear>
-	<url>https://github.com/WasiqB/coteafs-parent</url>
+	<url>${project.organization.url}/coteafs-${project.artifactId}</url>
 
 	<organization>
 		<name>Wasiq Bhamla</name>
@@ -26,28 +26,33 @@
 
 	<developers>
 		<developer>
-			<name>Wasiq Bhamla</name>
+			<name>${project.organization.name}</name>
 			<email>wasbhamla2005@gmail.com</email>
 			<roles>
 				<role>Project Lead</role>
 				<role>Project Maintainer</role>
 			</roles>
-			<organization>Wasiq Bhamla</organization>
-			<organizationUrl>https://github.com/WasiqB</organizationUrl>
+			<organization>${project.organization.name}</organization>
+			<organizationUrl>${project.organization.url}</organizationUrl>
 			<timezone>+5</timezone>
 		</developer>
 	</developers>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/WasiqB/coteafs-parent/issues</url>
+		<url>${project.url}/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:git@github.com:WasiqB/coteafs-parent.git</connection>
-		<developerConnection>scm:git:git@github.com:WasiqB/coteafs-parent.git</developerConnection>
-		<url>https://github.com/WasiqB/coteafs-parent</url>
+		<connection>scm:git:git@github.com:WasiqB/coteafs-${project.artifactId}.git</connection>
+		<developerConnection>scm:git:git@github.com:WasiqB/coteafs-${project.artifactId}.git</developerConnection>
+		<url>${project.url}</url>
 	</scm>
+
+	<ciManagement>
+		<system>CircleCI</system>
+		<url>https://circleci.com/gh/WasiqB/coteafs-${project.artifactId}</url>
+	</ciManagement>
 
 	<properties>
 		<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
@@ -60,20 +65,20 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.source.encoding>UTF-8</maven.source.encoding>
-		<maven.source.version>3.1.0</maven.source.version>
+		<maven.source.version>3.2.1</maven.source.version>
 		<maven.javadoc.version>3.1.1</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
-		<surefire-version>3.0.0-M3</surefire-version>
+		<surefire-version>3.0.0-M4</surefire-version>
 		<maven.clean.version>3.1.0</maven.clean.version>
 		<maven.resource.version>3.1.0</maven.resource.version>
 		<version.version>2.7</version.version>
 		<nexus.version>1.6.8</nexus.version>
-		<jacoco.version>0.8.4</jacoco.version>
+		<jacoco.version>0.8.5</jacoco.version>
 		<sonar.version>5.14.0.18788</sonar.version>
 		<suite-xml>testng.xml</suite-xml>
-		<guava.version>28.1-jre</guava.version>
-		<testng.version>7.0.0</testng.version>
-		<truth.version>1.0</truth.version>
+		<guava.version>28.2-jre</guava.version>
+		<testng.version>7.1.0</testng.version>
+		<truth.version>1.0.1</truth.version>
 		<commons.version>3.9</commons.version>
 	</properties>
 
@@ -183,7 +188,7 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>${suite-xml}</suiteXmlFile>
 					</suiteXmlFiles>
-					<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
+					<argLine>${argLine}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -244,7 +249,7 @@
 					<dependency>
 						<groupId>com.puppycrawl.tools</groupId>
 						<artifactId>checkstyle</artifactId>
-						<version>8.24</version>
+						<version>8.29</version>
 					</dependency>
 				</dependencies>
 			</plugin>
@@ -271,7 +276,7 @@
 							<suiteXmlFiles>
 								<suiteXmlFile>${suite-xml}</suiteXmlFile>
 							</suiteXmlFiles>
-							<argLine>${argLine} ${surefireArgLine}</argLine>
+							<argLine>${argLine}</argLine>
 						</configuration>
 					</plugin>
 				</plugins>
