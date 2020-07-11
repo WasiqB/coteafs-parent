@@ -6,3 +6,5 @@
 /.classpath
 /.project
 .DS_Store
+/parent.iml
+/.idea
