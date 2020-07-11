@@ -33,6 +33,8 @@ It was a tedious task of copy pasting same block of common code in every project
 
 :point_right: `maven-surefire-plugin`
 
+:point_right: `maven-checkstyle-plugin`
+
 ### Profiles declared
 
 :point_right: `coverage-per-test`: Used for analyzing code coverage for Sonarcloud.
@@ -48,7 +50,7 @@ You can use the following dependency into your `pom.xml` to use this library.
   <parent>
     <groupId>com.github.wasiqb.coteafs</groupId>
     <artifactId>parent</artifactId>
-    <version>2.2.0</version>
+    <version>3.1.0</version>
   </parent>
   . . .
 ```

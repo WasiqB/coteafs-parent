@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>2.2.0</version>
+	<version>3.1.1</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
 	<inceptionYear>2017</inceptionYear>
-	<url>https://github.com/WasiqB/coteafs-parent</url>
+	<url>${project.organization.url}/coteafs-${project.artifactId}</url>
 
 	<organization>
 		<name>Wasiq Bhamla</name>
@@ -26,36 +26,44 @@
 
 	<developers>
 		<developer>
-			<name>Wasiq Bhamla</name>
+			<name>${project.organization.name}</name>
 			<email>wasbhamla2005@gmail.com</email>
 			<roles>
 				<role>Project Lead</role>
 				<role>Project Maintainer</role>
 			</roles>
-			<organization>Wasiq Bhamla</organization>
-			<organizationUrl>https://github.com/WasiqB</organizationUrl>
+			<organization>${project.organization.name}</organization>
+			<organizationUrl>${project.organization.url}</organizationUrl>
 			<timezone>+5</timezone>
 		</developer>
 	</developers>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/WasiqB/coteafs-parent/issues</url>
+		<url>${project.url}/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:git@github.com:WasiqB/coteafs-parent.git</connection>
-		<developerConnection>scm:git:git@github.com:WasiqB/coteafs-parent.git</developerConnection>
-		<url>https://github.com/WasiqB/coteafs-parent</url>
+		<connection>scm:git:git@github.com:WasiqB/coteafs-${project.artifactId}.git</connection>
+		<developerConnection>scm:git:git@github.com:WasiqB/coteafs-${project.artifactId}.git</developerConnection>
+		<url>${project.url}</url>
 	</scm>
+
+	<ciManagement>
+		<system>CircleCI</system>
+		<url>https://circleci.com/gh/WasiqB/coteafs-${project.artifactId}</url>
+	</ciManagement>
 
 	<properties>
 		<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
 		<sonar.jacoco.reportPaths>${project.basedir}/reports/jacoco.exec</sonar.jacoco.reportPaths>
+		<checkstyle.config>checkstyle.xml</checkstyle.config>
+		<checkstyle.suppress>checkstyle-suppressions.xml</checkstyle.suppress>
+		<checkstyle.version>3.1.0</checkstyle.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.source.encoding>UTF-8</maven.source.encoding>
-		<maven.source.version>3.2.0</maven.source.version>
+		<maven.source.version>3.2.1</maven.source.version>
 		<maven.javadoc.version>3.2.0</maven.javadoc.version>
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<surefire-version>3.0.0-M5</surefire-version>
@@ -70,7 +78,6 @@
 		<testng.version>7.1.0</testng.version>
 		<truth.version>1.0.1</truth.version>
 		<commons.version>3.10</commons.version>
-		<yaml-version>1.26</yaml-version>
 		<java.release.version>11</java.release.version>
 	</properties>
 
@@ -89,6 +96,7 @@
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>${maven.clean.version}</version>
 				<executions>
@@ -178,7 +186,7 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>${suite-xml}</suiteXmlFile>
 					</suiteXmlFiles>
-					<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
+					<argLine>${argLine}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -207,6 +215,41 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<executions>
+					<execution>
+						<id>verify-style</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<configLocation>${checkstyle.config}</configLocation>
+					<suppressionsLocation>${checkstyle.suppress}</suppressionsLocation>
+					<encoding>UTF-8</encoding>
+					<consoleOutput>true</consoleOutput>
+					<logViolationsToConsole>true</logViolationsToConsole>
+					<failOnViolation>true</failOnViolation>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.duraspace</groupId>
+						<artifactId>codestyle</artifactId>
+						<version>1.0.0</version>
+					</dependency>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>8.29</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
