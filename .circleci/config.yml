@@ -5,7 +5,7 @@ orbs:
 
 mvn-deploy-command: &mvn-deploy-command
   mvn-deploy-command: mvn -s settings/settings.xml clean deploy -DskipTests -Dcheckstyle.skip -B -Prelease
-#  context: RELEASE_PROFILE_BBOTTEMA
+  context: RELEASE_PROFILE_WASIQB
 
 workflows:
   workflow:
