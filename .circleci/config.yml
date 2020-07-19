@@ -3,19 +3,33 @@ version: 2.1
 orbs:
   github-maven-deploy: github-maven-deploy/github-maven-deploy@1.2.0
 
+mvn-build-test-command: &mvn-build-test-command
+  mvn-build-test-command: mvn clean install -DskipTests -Dcheckstyle.skip
+
 mvn-deploy-command: &mvn-deploy-command
-  mvn-deploy-command: mvn -s settings/settings.xml clean deploy -DskipTests -Dcheckstyle.skip -B -Prelease
+  mvn-deploy-command: mvn -s .circleci/settings.xml clean deploy -DskipTests -Dcheckstyle.skip -B -Prelease
   context: RELEASE_PROFILE_WASIQB
 
 workflows:
   workflow:
     jobs:
+      - github-maven-deploy/build-and-test:
+          <<: *mvn-build-test-command
+          filters:
+            branches:
+              only: master
       - github-maven-deploy/approve-deploy-patch-version:
           type: approval
+          requires:
+            - github-maven-deploy/build-and-test
       - github-maven-deploy/approve-deploy-minor-version:
           type: approval
+          requires:
+            - github-maven-deploy/build-and-test
       - github-maven-deploy/approve-deploy-major-version:
           type: approval
+          requires:
+            - github-maven-deploy/build-and-test
       - github-maven-deploy/deploy-patch-version:
           requires:
             - github-maven-deploy/approve-deploy-patch-version
