@@ -5,6 +5,54 @@ executors:
     docker:
       - image: circleci/openjdk:11-jdk-stretch
 
+commands:
+  configure-gpg:
+    steps:
+      - run:
+          name: Configure GPG private key for signing project artifacts in OSS Sonatype
+          command: |
+            echo $SECRING_GPG_ASC_BASE64 | base64 --decode | gpg --batch --no-tty --import --yes
+  configure-git:
+    steps:
+      - run:
+          name: Configure GIT with host fingerprint, user info and SSH key for pushing
+          command: |
+            mkdir -p ~/.ssh
+            echo "Adding github.com as known host..."
+            echo $GITHUB_FINGERPRINT >> ~/.ssh/known_hosts
+            echo "Setting private SSH key for pushing new version to repo..."
+            echo $GITHUB_COMMIT_KEY | base64 --decode >> ~/.ssh/id_rsa
+            chmod 400 ~/.ssh/id_rsa # prevents "UNPROTECTED PRIVATE KEY FILE" error
+            git config user.name $GITHUB_USER_NAME
+            git config user.email $GITHUB_USER_EMAIL
+  deploy:
+    parameters:
+      version-command:
+        type: string
+    steps:
+      - attach_workspace:
+          at: .
+      - configure-gpg
+      - configure-git
+      - run:
+          name: Release new version to Maven Central and push new project version to repo
+          command: |
+            echo "Starting new release..."
+            << parameters.version-command >>
+            MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
+            echo "Releasing version ${MVN_VERSION}..."
+            mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
+            echo "Pushing new version and tag..."
+            git commit -am "released ${MVN_VERSION}"
+            git tag -a ${MVN_VERSION} -m "Release ${MVN_VERSION}"
+            ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push git@github.com:WasiqB/coteafs-parent.git'
+            ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push origin --tags'
+            echo "Succesfully released ${MVN_VERSION}"
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: coteafs-parent-{{ checksum ".circleci/config.yml" }}
+
 jobs:
   working_directory: ~/repo
 
@@ -19,20 +67,20 @@ jobs:
   deploy-patch-version:
     executor: maven-executor
     steps:
-      - run:
-          command: ""
+      - deploy:
+          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit
 
   deploy-minor-version:
     executor: maven-executor
     steps:
-      - run:
-          command: ""
+      - deploy:
+          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.\${parsedVersion.incrementalVersion} versions:commit
 
   deploy-major-version:
     executor: maven-executor
     steps:
-      - run:
-          command: ""
+      - deploy:
+          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion} versions:commit
 
 workflows:
   workflow:
@@ -53,9 +101,12 @@ workflows:
       - deploy-patch-version:
           requires:
             - approve-patch-version
+          context: RELEASE_PROFILE_WASIQB
       - deploy-minor-version:
           requires:
             - approve-minor-version
+          context: RELEASE_PROFILE_WASIQB
       - deploy-major-version:
           requires:
             - approve-major-version
+          context: RELEASE_PROFILE_WASIQB
