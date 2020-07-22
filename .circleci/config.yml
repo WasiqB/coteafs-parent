@@ -14,6 +14,8 @@ commands:
             echo $SECRING_GPG_ASC_BASE64 | base64 --decode | gpg --batch --no-tty --import --yes
   configure-git:
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Configure GIT with host fingerprint, user info and SSH key for pushing
           command: |
@@ -24,7 +26,7 @@ commands:
             echo $GITHUB_COMMIT_KEY | base64 --decode >> ~/.ssh/id_rsa
             echo "Setting permissions to avoid errors."
             chmod 400 ~/.ssh/id_rsa # prevents "UNPROTECTED PRIVATE KEY FILE" error
-            cd ~/repo
+            echo $PWD
             git config user.name $GITHUB_USER_NAME
             git config user.email $GITHUB_USER_EMAIL
   deploy:
@@ -39,7 +41,7 @@ commands:
       - run:
           name: Release new version to Maven Central and push new project version to repo
           command: |
-            cd ~/repo
+            echo $PWD
             echo "Starting new release..."
             << parameters.version-command >>
             MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
