@@ -1,44 +1,33 @@
 version: 2.1
 
-orbs:
-  github-maven-deploy: github-maven-deploy/github-maven-deploy@1.2.0
+executors:
+  maven-executor:
+    docker:
+      - image: circleci/openjdk:11-jdk-stretch
 
-mvn-build-test-command: &mvn-build-test-command
-  mvn-build-test-command: mvn clean install -DskipTests -Dcheckstyle.skip
+jobs:
 
-mvn-deploy-command: &mvn-deploy-command
-  mvn-deploy-command: mvn -s .circleci/settings.xml clean deploy -DskipTests -Dcheckstyle.skip -B -Prelease
-  context: RELEASE_PROFILE_WASIQB
+  build-and-test:
+    executor: maven-executor
+
+    steps:
+      - checkout
+      - restore_cache:
+          key: coteafs-parent-{{ checksum ".circleci/config.yml" }}
+      - run:
+          command: mvn clean install -DskipTests -Dcheckstyle.skip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+      - run:
+          shell: /bin/bash -eo pipefail -O globstar
+          command: |
+            cp **/target/*.pom artifacts/
+      - store_artifacts:
+          path: artifacts
 
 workflows:
   workflow:
     jobs:
-      - github-maven-deploy/build-and-test:
-          <<: *mvn-build-test-command
-          filters:
-            branches:
-              only: master
-      - github-maven-deploy/approve-deploy-patch-version:
-          type: approval
-          requires:
-            - github-maven-deploy/build-and-test
-      - github-maven-deploy/approve-deploy-minor-version:
-          type: approval
-          requires:
-            - github-maven-deploy/build-and-test
-      - github-maven-deploy/approve-deploy-major-version:
-          type: approval
-          requires:
-            - github-maven-deploy/build-and-test
-      - github-maven-deploy/deploy-patch-version:
-          requires:
-            - github-maven-deploy/approve-deploy-patch-version
-          <<: *mvn-deploy-command
-      - github-maven-deploy/deploy-minor-version:
-          requires:
-            - github-maven-deploy/approve-deploy-minor-version
-          <<: *mvn-deploy-command
-      - github-maven-deploy/deploy-major-version:
-          requires:
-            - github-maven-deploy/approve-deploy-major-version
-          <<: *mvn-deploy-command
+      - build-and-test
