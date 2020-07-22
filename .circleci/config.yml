@@ -68,6 +68,10 @@ jobs:
       - checkout
       - run:
           command: mvn clean install -DskipTests -Dcheckstyle.skip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   deploy-patch-version:
     executor: maven-executor
