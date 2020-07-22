@@ -24,7 +24,7 @@ commands:
             echo $GITHUB_COMMIT_KEY | base64 --decode >> ~/.ssh/id_rsa
             echo "Setting permissions to avoid errors."
             chmod 400 ~/.ssh/id_rsa # prevents "UNPROTECTED PRIVATE KEY FILE" error
-            echo $PWD
+            cd ~/repo
             git config user.name $GITHUB_USER_NAME
             git config user.email $GITHUB_USER_EMAIL
   deploy:
@@ -39,7 +39,7 @@ commands:
       - run:
           name: Release new version to Maven Central and push new project version to repo
           command: |
-            echo $PWD
+            cd ~/repo
             echo "Starting new release..."
             << parameters.version-command >>
             MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
