@@ -16,7 +16,46 @@ jobs:
       - run:
           command: mvn clean install -DskipTests -Dcheckstyle.skip
 
+  deploy-patch-version:
+    executor: maven-executor
+    steps:
+      - run:
+          command: ""
+
+  deploy-minor-version:
+    executor: maven-executor
+    steps:
+      - run:
+          command: ""
+
+  deploy-major-version:
+    executor: maven-executor
+    steps:
+      - run:
+          command: ""
+
 workflows:
   workflow:
     jobs:
       - build-and-test
+      - approve-patch-version:
+          type: approval
+          requires:
+            - build-and-test
+      - approve-minor-version:
+          type: approval
+          requires:
+            - build-and-test
+      - approve-major-version:
+          type: approval
+          requires:
+            - build-and-test
+      - deploy-patch-version:
+          requires:
+            - approve-patch-version
+      - deploy-minor-version:
+          requires:
+            - approve-minor-version
+      - deploy-major-version:
+          requires:
+            - approve-major-version
