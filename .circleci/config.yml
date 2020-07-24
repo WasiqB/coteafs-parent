@@ -26,9 +26,11 @@ commands:
             echo $GITHUB_COMMIT_KEY | base64 --decode >> ~/.ssh/id_rsa
             echo "Setting permissions to avoid errors."
             chmod 400 ~/.ssh/id_rsa # prevents "UNPROTECTED PRIVATE KEY FILE" error
-            echo $PWD
+            chmod 755 ./.circleci/gpg-ci
             git config user.name $GITHUB_USER_NAME
             git config user.email $GITHUB_USER_EMAIL
+            git config gpg.program "./.circleci/gpg-ci"
+            git config user.signingkey $GPG_SIGNING_KEY
   deploy:
     parameters:
       version-command:
@@ -49,7 +51,7 @@ commands:
             mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
             echo "Pushing new version and tag..."
             git commit -am "released ${MVN_VERSION}"
-            git tag -a ${MVN_VERSION} -m "Release ${MVN_VERSION}"
+            git tag -s v-${MVN_VERSION} -m "Released v-${MVN_VERSION}"
             ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push git@github.com:WasiqB/coteafs-parent.git'
             ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push origin --tags'
             echo "Succesfully released ${MVN_VERSION}"
