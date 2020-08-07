@@ -56,7 +56,7 @@
 
 	<properties>
 		<argLine>-Dfile.encoding=UTF-8 -Xdebug -Xnoagent</argLine>
-		<sonar.jacoco.reportPaths>${project.basedir}/reports/jacoco.exec</sonar.jacoco.reportPaths>
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/reports/jacoco.exec</sonar.coverage.jacoco.xmlReportPaths>
 		<checkstyle.config>checkstyle.xml</checkstyle.config>
 		<checkstyle.suppress>checkstyle-suppressions.xml</checkstyle.suppress>
 		<checkstyle.version>3.1.0</checkstyle.version>
@@ -79,6 +79,7 @@
 		<truth.version>1.0.1</truth.version>
 		<commons.version>3.10</commons.version>
 		<java.release.version>11</java.release.version>
+		<sonar.java.source>11</sonar.java.source>
 	</properties>
 
 	<distributionManagement>
@@ -199,7 +200,7 @@
 							<goal>prepare-agent</goal>
 						</goals>
 						<configuration>
-							<destFile>${sonar.jacoco.reportPaths}</destFile>
+							<destFile>${sonar.coverage.jacoco.xmlReportPaths}</destFile>
 							<propertyName>surefireArgLine</propertyName>
 						</configuration>
 					</execution>
@@ -210,7 +211,7 @@
 							<goal>report</goal>
 						</goals>
 						<configuration>
-							<dataFile>${sonar.jacoco.reportPaths}</dataFile>
+							<dataFile>${sonar.coverage.jacoco.xmlReportPaths}</dataFile>
 							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
 						</configuration>
 					</execution>
