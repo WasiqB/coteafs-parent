@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wasiqb.coteafs</groupId>
 	<artifactId>parent</artifactId>
-	<version>3.3.2</version>
+	<version>3.3.3</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>coteafs-parent pom.</description>
