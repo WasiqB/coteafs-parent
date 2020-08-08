@@ -56,7 +56,7 @@ commands:
             echo "Releasing version ${MVN_VERSION}..."
             mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
             echo "Pushing new version and tag..."
-            git commit -am "released ${MVN_VERSION}"
+            git commit -am "Released v${MVN_VERSION} [skip ci]"
             git tag -s v${MVN_VERSION} -m "Released v${MVN_VERSION}"
             ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push git@github.com:WasiqB/coteafs-parent.git'
             ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push origin --tags'
