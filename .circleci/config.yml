@@ -1,76 +1,17 @@
 version: 2.1
 
-executors:
-  maven-executor:
-    docker:
-      - image: circleci/openjdk:11-jdk-stretch
+orbs:
+  maven-deploy: wasiqb/maven-deploy@1.0.1
 
-commands:
-  configure-gpg:
-    steps:
-      - run:
-          name: Configure GPG private key for signing project artifacts in OSS Sonatype
-          command: |
-            echo $SECRING_GPG_ASC_BASE64 | base64 --decode | gpg --batch --no-tty --import --yes
-  configure-git:
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Configure GIT with host fingerprint, user info and SSH key for pushing
-          command: |
-            mkdir -p ~/.ssh
-            echo "Adding github.com as known host..."
-            echo $GITHUB_FINGERPRINT >> ~/.ssh/known_hosts
-            echo "Setting private SSH key for pushing new version to repo..."
-            echo $GITHUB_COMMIT_KEY | base64 --decode >> ~/.ssh/id_rsa
-            echo "Setting permissions to avoid errors."
-            chmod 400 ~/.ssh/id_rsa # prevents "UNPROTECTED PRIVATE KEY FILE" error
-            chmod 755 ./.circleci/gpg-ci
-            git config user.name $GITHUB_USER_NAME
-            git config user.email $GITHUB_USER_EMAIL
-            git config gpg.program "./.circleci/gpg-ci"
-            git config user.signingkey $GPG_SIGNING_KEY
-  deploy:
-    parameters:
-      version-snapshot-command:
-        type: string
-      version-command:
-        type: string
-    steps:
-      - attach_workspace:
-          at: .
-      - configure-gpg
-      - configure-git
-      - run:
-          name: Release new version to Maven Central and push new project version to repo
-          command: |
-            echo $PWD
-            echo "Starting new release..."
-            << parameters.version-snapshot-command >>
-            MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
-            echo "Releasing Snapshot version ${MVN_VERSION}..."
-            mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
-            << parameters.version-command >>
-            MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
-            echo "Releasing version ${MVN_VERSION}..."
-            mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
-            echo "Pushing new version and tag..."
-            git commit -am "Released v${MVN_VERSION} [skip ci]"
-            git tag -s v${MVN_VERSION} -m "Released v${MVN_VERSION}"
-            ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push git@github.com:WasiqB/coteafs-parent.git'
-            ssh-agent sh -c 'ssh-add ~/.ssh/id_rsa; git push origin --tags'
-            echo "Succesfully released ${MVN_VERSION}"
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: coteafs-parent-{{ checksum ".circleci/config.yml" }}
+maven-deploy-command: &deploy-command
+  deploy-command: mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
+  context: RELEASE_PROFILE_WASIQB
 
 jobs:
   working_directory: ~/repo
 
   build-and-test:
-    executor: maven-executor
+    executor: maven-deploy/maven
 
     steps:
       - checkout
@@ -82,27 +23,6 @@ jobs:
           root: .
           paths:
             - .
-
-  deploy-patch-version:
-    executor: maven-executor
-    steps:
-      - deploy:
-          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion} versions:commit
-          version-snapshot-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
-
-  deploy-minor-version:
-    executor: maven-executor
-    steps:
-      - deploy:
-          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.0 versions:commit
-          version-snapshot-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT versions:commit
-
-  deploy-major-version:
-    executor: maven-executor
-    steps:
-      - deploy:
-          version-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.0.0 versions:commit
-          version-snapshot-command: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT versions:commit
 
 filters: &master_branch
   branches:
@@ -120,31 +40,30 @@ workflows:
                 - master
                 - release
                 - /issue-.*/
-
-      - approve-patch-version:
+      - maven-deploy/approve-patch-version:
           type: approval
           filters: *master_branch
           requires:
             - build-and-test
-      - approve-minor-version:
+      - maven-deploy/approve-minor-version:
           type: approval
           filters: *master_branch
           requires:
             - build-and-test
-      - approve-major-version:
+      - maven-deploy/approve-major-version:
           type: approval
           filters: *master_branch
           requires:
             - build-and-test
-      - deploy-patch-version:
+      - maven-deploy/deploy-patch-version:
           requires:
-            - approve-patch-version
-          context: RELEASE_PROFILE_WASIQB
-      - deploy-minor-version:
+            - maven-deploy/approve-patch-version
+          <<: *deploy-command
+      - maven-deploy/deploy-minor-version:
           requires:
-            - approve-minor-version
-          context: RELEASE_PROFILE_WASIQB
-      - deploy-major-version:
+            - maven-deploy/approve-minor-version
+          <<: *deploy-command
+      - maven-deploy/deploy-major-version:
           requires:
-            - approve-major-version
-          context: RELEASE_PROFILE_WASIQB
+            - maven-deploy/approve-major-version
+          <<: *deploy-command
