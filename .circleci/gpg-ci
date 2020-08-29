@@ -1,1 +1,0 @@
-gpg --passphrase "$GPG_PASSPHRASE" --batch --no-tty "$@"

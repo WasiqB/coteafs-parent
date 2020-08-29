@@ -1,69 +1,31 @@
 version: 2.1
 
 orbs:
-  maven-deploy: wasiqb/maven-deploy@1.0.2
+  maven-deploy: wasiqb/maven-deploy@2.0.0
 
 maven-deploy-command: &deploy-command
   deploy-command: mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
   context: RELEASE_PROFILE_WASIQB
 
-jobs:
-  working_directory: ~/repo
-
-  build-and-test:
-    executor: maven-deploy/maven
-
-    steps:
-      - checkout
-      - restore_cache:
-          key: coteafs-parent-{{ checksum ".circleci/config.yml" }}
-      - run:
-          command: mvn clean install -DskipTests -Dcheckstyle.skip
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-filters: &master_branch
-  branches:
-    only:
-      - master
-
 workflows:
   workflow:
     jobs:
-      - build-and-test:
+      - maven-deploy/code-checkout
+      - maven-deploy/build:
+          command: mvn clean install -DskipTests -Dcheckstyle.skip
+          requires:
+            - maven-deploy/code-checkout
           filters:
             branches:
               only:
-                - develop
                 - master
                 - release
                 - /issue-.*/
-      - maven-deploy/approve-patch-version:
-          type: approval
-          filters: *master_branch
+      - maven-deploy/deploy:
+          filters:
+            branches:
+              only:
+                - master
           requires:
-            - build-and-test
-      - maven-deploy/approve-minor-version:
-          type: approval
-          filters: *master_branch
-          requires:
-            - build-and-test
-      - maven-deploy/approve-major-version:
-          type: approval
-          filters: *master_branch
-          requires:
-            - build-and-test
-      - maven-deploy/deploy-patch-version:
-          requires:
-            - maven-deploy/approve-patch-version
-          <<: *deploy-command
-      - maven-deploy/deploy-minor-version:
-          requires:
-            - maven-deploy/approve-minor-version
-          <<: *deploy-command
-      - maven-deploy/deploy-major-version:
-          requires:
-            - maven-deploy/approve-major-version
+            - maven-deploy/build
           <<: *deploy-command
