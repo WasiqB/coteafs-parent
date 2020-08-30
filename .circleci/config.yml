@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  maven-deploy: wasiqb/maven-deploy@2.0.1
+  maven-deploy: wasiqb/maven-deploy@2.0.3
 
 maven-deploy-command: &deploy-command
   deploy-command: mvn deploy --settings .circleci/settings.xml -DskipTests -Dcheckstyle.skip -B -Prelease
@@ -22,6 +22,7 @@ workflows:
                 - release
                 - /issue-.*/
       - maven-deploy/deploy:
+          mentions: mfaisalkhatri,wbhamla1
           filters:
             branches:
               only:
@@ -29,5 +30,3 @@ workflows:
           requires:
             - maven-deploy/build
           <<: *deploy-command
-      - maven-deploy/notify:
-          mentions: mfaisalkhatri,wbhamla1
