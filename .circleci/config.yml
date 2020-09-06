@@ -20,6 +20,7 @@ workflows:
       - maven-deploy/deploy:
           mentions: mfaisalkhatri,wbhamla1
           fail_only: false
+          webhook: ${SLACK_WEBHOOK}
           filters:
             branches:
               only:
