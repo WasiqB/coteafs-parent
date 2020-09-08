@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  maven-deploy: wasiqb/maven-deploy@2.0.5
+  maven-deploy: wasiqb/maven-deploy@2.0.6
 
 workflows:
   workflow:
@@ -20,7 +20,6 @@ workflows:
       - maven-deploy/deploy:
           mentions: mfaisalkhatri,wbhamla1
           fail_only: false
-          webhook: ${SLACK_WEBHOOK}
           filters:
             branches:
               only:
