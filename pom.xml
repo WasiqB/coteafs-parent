@@ -61,7 +61,7 @@
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		<checkstyle.config>checkstyle.xml</checkstyle.config>
 		<checkstyle.suppress>checkstyle-suppressions.xml</checkstyle.suppress>
-		<checkstyle.version>3.1.0</checkstyle.version>
+		<checkstyle.version>3.1.1</checkstyle.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.source.encoding>UTF-8</maven.source.encoding>
@@ -70,18 +70,18 @@
 		<maven.gpg.version>1.6</maven.gpg.version>
 		<surefire-version>3.0.0-M5</surefire-version>
 		<maven.clean.version>3.1.0</maven.clean.version>
-		<maven.resource.version>3.1.0</maven.resource.version>
-		<version.version>2.7</version.version>
+		<maven.resource.version>3.2.0</maven.resource.version>
+		<version.version>2.8.1</version.version>
 		<nexus.version>1.6.8</nexus.version>
-		<jacoco.version>0.8.5</jacoco.version>
+		<jacoco.version>0.8.6</jacoco.version>
 		<sonar.version>5.14.0.18788</sonar.version>
 		<suite-xml>testng.xml</suite-xml>
-		<guava.version>29.0-jre</guava.version>
-		<testng.version>7.1.0</testng.version>
-		<truth.version>1.0.1</truth.version>
-		<commons.version>3.10</commons.version>
-		<java.release.version>11</java.release.version>
-		<sonar.java.source>11</sonar.java.source>
+		<guava.version>30.0-jre</guava.version>
+		<testng.version>7.3.0</testng.version>
+		<truth.version>1.1</truth.version>
+		<commons.version>3.11</commons.version>
+		<java.release.version>15</java.release.version>
+		<sonar.java.source>15</sonar.java.source>
 	</properties>
 
 	<distributionManagement>
@@ -245,12 +245,12 @@
 					<dependency>
 						<groupId>org.duraspace</groupId>
 						<artifactId>codestyle</artifactId>
-						<version>1.0.0</version>
+						<version>1.1.0</version>
 					</dependency>
 					<dependency>
 						<groupId>com.puppycrawl.tools</groupId>
 						<artifactId>checkstyle</artifactId>
-						<version>8.29</version>
+						<version>8.38</version>
 					</dependency>
 				</dependencies>
 			</plugin>
