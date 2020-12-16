@@ -75,7 +75,8 @@
 		<nexus.version>1.6.8</nexus.version>
 		<jacoco.version>0.8.6</jacoco.version>
 		<sonar.version>5.14.0.18788</sonar.version>
-		<suite-xml>testng.xml</suite-xml>
+		<suite-xml>testng.yaml</suite-xml>
+		<snake.version>1.27</snake.version>
 		<guava.version>30.0-jre</guava.version>
 		<testng.version>7.3.0</testng.version>
 		<truth.version>1.1</truth.version>
