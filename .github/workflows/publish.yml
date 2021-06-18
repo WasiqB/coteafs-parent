@@ -17,12 +17,9 @@ env:
 jobs:
   validate-input:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.release_type != 'patch' }}
+    if: ${{ github.event.inputs.release_type == 'patch' }}
     steps:
-      - name: Invalid input sent.
-        run: |
-          echo "Invalid input [${{ github.event.inputs.release_type }}] selected."
-          exit 1
+      - run: echo "[${{ github.event.inputs.release_type }}] release in progress."
 
   prepare-release-patch-snapshot:
     needs:
