@@ -23,3 +23,9 @@ jobs:
 
       - name: Build the project
         run: mvn clean install -DskipTests -Dcheckstyle.skip
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ github.sha }}
