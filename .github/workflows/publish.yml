@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.release_type == 'patch' }}
     steps:
-      - run: echo "[${{ github.event.inputs.release_type }}] release in progress."
+      - name: Release Type selected for making release
+        run: echo "[${{ github.event.inputs.release_type }}] release in progress."
 
   prepare-release-patch-snapshot:
     needs:
@@ -44,6 +45,9 @@ jobs:
 
       - name: Maven command to update Patch snapshot version
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
+
+      - name: Build the artifacts
+        run: mvn clean install -DskipTests -Dcheckstyle.skip
 
       - name: Upload target folder
         uses: actions/upload-artifact@v2
@@ -78,7 +82,7 @@ jobs:
         with:
           name: target
 
-      - name: Release Maven package
+      - name: Release patch snapshot to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -109,8 +113,16 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ github.sha }}
 
-      - name: Maven command to update Patch snapshot version
+      - name: Download target folder
+        uses: actions/download-artifact@v2
+        with:
+          name: target
+
+      - name: Maven command to update Patch version
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion} versions:commit
+
+      - name: Build the project
+        run: mvn clean install -DskipTests -Dcheckstyle.skip
 
       - name: Upload target folder
         uses: actions/upload-artifact@v2
@@ -145,7 +157,7 @@ jobs:
         with:
           name: target
 
-      - name: Release Maven package
+      - name: Release patch to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -155,3 +167,82 @@ jobs:
           maven_profiles: release
           server_id: ossrh
           maven_args: --settings ${{ github.workspace }}/setting/settings.xml -DskipTests -Dcheckstyle.skip -B
+
+  push-pom:
+    runs-on: ubuntu-latest
+    needs:
+      - release-major
+      - release-minor
+      - release-patch
+    outputs:
+      release-version: ${{ steps.artifacts.outputs.version }}
+    if: always()
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Java and Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '15'
+          distribution: 'adopt'
+
+      - name: Download target folder
+        uses: actions/download-artifact@v2
+        with:
+          name: target
+
+      - name: Get the release version
+        id: artifacts
+        run: |
+          MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
+          echo "::set-output name=version::$MVN_VERSION"
+
+      - name: Push updated pom.xml
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: pom.xml
+          message: Released v-$MVN_VERSION to Maven central
+          default_author: github_actions
+          push: true
+
+  push-tag:
+    runs-on: ubuntu-latest
+    needs:
+      - push-pom
+    steps:
+      - name: Download target folder
+        uses: actions/download-artifact@v2
+        with:
+          name: target
+
+      - name: Push updated pom.xml
+        uses: EndBug/add-and-commit@v7
+        with:
+          tag: v${{ needs.push-pom.outputs.release-version }}
+          message: Released to Maven central
+          default_author: github_actions
+          signoff: true
+          push: true
+
+  github-release:
+    runs-on: ubuntu-latest
+    needs:
+      - push-pom
+      - push-tag
+    steps:
+      - name: Download target folder
+        uses: actions/download-artifact@v2
+        with:
+          name: target
+
+      - name: Create GitHub Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: v${{ needs.push-pom.outputs.release-version }}
+          title: Version ${{ needs.push-pom.outputs.release-version }}
+          prerelease: false
+          files: |
+            target/*.jar
+            target/*.pom
