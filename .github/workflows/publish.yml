@@ -17,16 +17,17 @@ env:
 jobs:
   validate-input:
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.release_type == 'patch' }}
+    if: ${{ github.event.inputs.release_type == 'major' ||
+        github.event.inputs.release_type == 'minor' ||
+        github.event.inputs.release_type == 'patch' }}
     steps:
       - name: Release Type selected for making release
         run: echo "[${{ github.event.inputs.release_type }}] release in progress."
 
-  prepare-release-patch-snapshot:
+  prepare-release-snapshot:
     needs:
       - validate-input
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.release_type == 'patch' }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -43,7 +44,16 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ github.sha }}
 
+      - name: Maven command to update Major snapshot version
+        if: ${{ github.event.inputs.release_type == 'major' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT versions:commit
+
+      - name: Maven command to update Minor snapshot version
+        if: ${{ github.event.inputs.release_type == 'minor' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT versions:commit
+
       - name: Maven command to update Patch snapshot version
+        if: ${{ github.event.inputs.release_type == 'patch' }}
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT versions:commit
 
       - name: Build the artifacts
@@ -57,10 +67,10 @@ jobs:
             ${{ github.workspace }}/target
             ${{ github.workspace }}/pom.xml
 
-  release-patch-snapshot:
+  release-snapshot:
     runs-on: ubuntu-latest
     needs:
-      - prepare-release-patch-snapshot
+      - prepare-release-snapshot
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -82,7 +92,7 @@ jobs:
         with:
           name: target
 
-      - name: Release patch snapshot to Maven central
+      - name: Release snapshot to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -93,9 +103,9 @@ jobs:
           server_id: ossrh
           maven_args: --settings ${{ github.workspace }}/setting/settings.xml -DskipTests -Dcheckstyle.skip -B
 
-  prepare-release-patch:
+  prepare-release:
     needs:
-      - release-patch-snapshot
+      - release-snapshot
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
@@ -118,7 +128,16 @@ jobs:
         with:
           name: target
 
+      - name: Maven command to update Major version
+        if: ${{ github.event.inputs.release_type == 'major' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.0.0 versions:commit
+
+      - name: Maven command to update Minor version
+        if: ${{ github.event.inputs.release_type == 'minor' }}
+        run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.0 versions:commit
+
       - name: Maven command to update Patch version
+        if: ${{ github.event.inputs.release_type == 'patch' }}
         run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion} versions:commit
 
       - name: Build the project
@@ -132,10 +151,10 @@ jobs:
             ${{ github.workspace }}/target
             ${{ github.workspace }}/pom.xml
 
-  release-patch:
+  maven-release:
     runs-on: ubuntu-latest
     needs:
-      - prepare-release-patch
+      - prepare-release
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -157,7 +176,7 @@ jobs:
         with:
           name: target
 
-      - name: Release patch to Maven central
+      - name: Release to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -171,12 +190,9 @@ jobs:
   push-pom:
     runs-on: ubuntu-latest
     needs:
-      - release-major
-      - release-minor
-      - release-patch
+      - maven-release
     outputs:
       release-version: ${{ steps.artifacts.outputs.version }}
-    if: always()
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
