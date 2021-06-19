@@ -1,4 +1,4 @@
-name: Artifacts deployment to Maven Central
+name: Deploy Release to GitHub and Maven Central
 
 on:
   workflow_dispatch:
@@ -218,7 +218,7 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           add: pom.xml
-          message: Released v-$MVN_VERSION to Maven central
+          message: Released latest version to Maven central
           default_author: github_actions
           push: true
 
@@ -256,12 +256,16 @@ jobs:
           name: target
 
       - name: Create GitHub Release
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: v${{ needs.push-pom.outputs.release-version }}
-          title: Version ${{ needs.push-pom.outputs.release-version }}
+          body_path: changelogs/latest.md
+          tag_name: v${{ needs.push-pom.outputs.release-version }}
+          name: Version ${{ needs.push-pom.outputs.release-version }}
           prerelease: false
+          draft: false
           files: |
             target/*.jar
             target/*.pom
