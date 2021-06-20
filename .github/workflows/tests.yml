@@ -1,0 +1,31 @@
+name: Tests for coteafs-parent project
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+      - issue-*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Java and Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '15'
+          distribution: 'adopt'
+
+      - name: Build the project
+        run: mvn clean install -DskipTests -Dcheckstyle.skip
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ github.sha }}
