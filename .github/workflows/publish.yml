@@ -221,7 +221,6 @@ jobs:
           passphrase: ${{ env.GPG_PASSPHRASE }}
           git-user-signingkey: true
           git-commit-gpgsign: true
-          git-push-gpgsign: true
 
       - name: Push updated pom.xml
         uses: EndBug/add-and-commit@v7
@@ -252,7 +251,6 @@ jobs:
           git-user-signingkey: true
           git-commit-gpgsign: true
           git-tag-gpgsign: true
-          git-push-gpgsign: true
 
       - name: Create and Push Tag
         uses: EndBug/add-and-commit@v7
