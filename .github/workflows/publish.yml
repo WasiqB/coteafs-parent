@@ -95,10 +95,10 @@ jobs:
       - name: Release snapshot to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+          gpg_private_key: ${{ env.GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ env.GPG_PASSPHRASE }}
+          nexus_username: ${{ env.NEXUS_USERNAME }}
+          nexus_password: ${{ env.NEXUS_PASSWORD }}
           maven_profiles: release
           server_id: ossrh
           maven_args: --settings ${{ github.workspace }}/setting/settings.xml -DskipTests -Dcheckstyle.skip -B
@@ -179,10 +179,10 @@ jobs:
       - name: Release to Maven central
         uses: samuelmeuli/action-maven-publish@v1
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+          gpg_private_key: ${{ env.GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ env.GPG_PASSPHRASE }}
+          nexus_username: ${{ env.NEXUS_USERNAME }}
+          nexus_password: ${{ env.NEXUS_PASSWORD }}
           maven_profiles: release
           server_id: ossrh
           maven_args: --settings ${{ github.workspace }}/setting/settings.xml -DskipTests -Dcheckstyle.skip -B
@@ -214,12 +214,20 @@ jobs:
           export MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
           echo "::set-output name=version::$MVN_VERSION"
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
+          passphrase: ${{ env.GPG_PASSPHRASE }}
+          git-user-signingkey: true
+          git-commit-gpgsign: true
+          git-push-gpgsign: true
+
       - name: Push updated pom.xml
         uses: EndBug/add-and-commit@v7
         with:
           add: pom.xml
           message: Released latest version to Maven central
-          default_author: github_actions
           push: true
           signoff: true
 
@@ -236,12 +244,21 @@ jobs:
         with:
           name: target
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
+          passphrase: ${{ env.GPG_PASSPHRASE }}
+          git-user-signingkey: true
+          git-commit-gpgsign: true
+          git-tag-gpgsign: true
+          git-push-gpgsign: true
+
       - name: Create and Push Tag
         uses: EndBug/add-and-commit@v7
         with:
           tag: v${{ needs.push-pom.outputs.release-version }}
           message: Released to Maven central
-          default_author: github_actions
           signoff: true
           push: true
 
