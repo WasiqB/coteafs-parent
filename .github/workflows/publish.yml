@@ -214,20 +214,13 @@ jobs:
           export MVN_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
           echo "::set-output name=version::$MVN_VERSION"
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
-          passphrase: ${{ env.GPG_PASSPHRASE }}
-          git-user-signingkey: true
-          git-commit-gpgsign: true
-
       - name: Push updated pom.xml
         uses: EndBug/add-and-commit@v7
         with:
           add: pom.xml
           message: Released latest version to Maven central
           push: true
+          default_author: user_info
           signoff: true
 
   push-tag:
@@ -243,21 +236,13 @@ jobs:
         with:
           name: target
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
-          passphrase: ${{ env.GPG_PASSPHRASE }}
-          git-user-signingkey: true
-          git-commit-gpgsign: true
-          git-tag-gpgsign: true
-
       - name: Create and Push Tag
         uses: EndBug/add-and-commit@v7
         with:
           tag: v${{ needs.push-pom.outputs.release-version }}
           message: Released to Maven central
           signoff: true
+          default_author: user_info
           push: true
 
   github-release:
