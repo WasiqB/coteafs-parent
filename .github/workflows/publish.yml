@@ -286,6 +286,7 @@ jobs:
           name: Version ${{ needs.push-pom.outputs.release-version }}
           prerelease: false
           draft: false
+          discussion_category_name: Announcements
           files: |
             target/*.jar
             target/*.pom
