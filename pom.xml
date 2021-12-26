@@ -76,7 +76,7 @@
 		<jacoco.version>0.8.7</jacoco.version>
 		<sonar.version>5.14.0.18788</sonar.version>
 		<suite-xml>testng.yaml</suite-xml>
-		<snake.version>1.29</snake.version>
+		<snake.version>1.30</snake.version>
 		<guava.version>31.0.1-jre</guava.version>
 		<testng.version>7.4.0</testng.version>
 		<truth.version>1.1.3</truth.version>
@@ -251,7 +251,7 @@
 					<dependency>
 						<groupId>com.puppycrawl.tools</groupId>
 						<artifactId>checkstyle</artifactId>
-						<version>9.1</version>
+						<version>9.2</version>
 					</dependency>
 				</dependencies>
 			</plugin>
